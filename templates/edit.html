@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Perangkat - KKG Guru SDIT Mutiara{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 font-sans">
+  <div class="max-w-3xl mx-auto p-6 md:p-8">
+    <!-- Header -->
+    <div class="mb-6">
+      <a href="{{ url_for('dashboard', tab='saya') }}" class="text-emerald-600 hover:text-emerald-700 text-sm font-bold flex items-center gap-2 mb-4">
+        ← Kembali ke Dashboard
+      </a>
+      <h1 class="text-2xl md:text-3xl font-black text-slate-800 uppercase tracking-tight">
+        ✏️ Edit Perangkat
+      </h1>
+      <p class="text-sm text-slate-400 mt-1">Perbarui informasi perangkat ajar Anda</p>
+    </div>
+
+    <!-- Form Edit -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-md p-6 md:p-8">
+      <form method="post" action="{{ url_for('edit', file_id=file_data.id) }}" enctype="multipart/form-data" class="space-y-6">
+        <div>
+          <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+            Judul File Perangkat
+          </label>
+          <input
+            type="text"
+            name="judul"
+            value="{{ file_data.judul }}"
+            placeholder="Contoh: Modul Ajar Matematika - Pecahan"
+            class="w-full px-4 md:px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none transition-all text-sm"
+            required
+          />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+              Mata Pelajaran
+            </label>
+            <select
+              name="mapel"
+              class="w-full px-4 md:px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none cursor-pointer text-sm font-bold text-slate-700"
+            >
+              <option value="Matematika" {% if file_data.mapel == 'Matematika' %}selected{% endif %}>Matematika</option>
+              <option value="B. Indonesia" {% if file_data.mapel == 'B. Indonesia' %}selected{% endif %}>B. Indonesia</option>
+              <option value="IPAS" {% if file_data.mapel == 'IPAS' %}selected{% endif %}>IPAS</option>
+              <option value="Seni Rupa" {% if file_data.mapel == 'Seni Rupa' %}selected{% endif %}>Seni Rupa</option>
+              <option value="Pancasila" {% if file_data.mapel == 'Pancasila' %}selected{% endif %}>Pancasila</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+              Tipe Dokumen
+            </label>
+            <select
+              name="tipe"
+              class="w-full px-4 md:px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none cursor-pointer text-sm font-bold text-slate-700"
+            >
+              {% for tipe in all_tipe %}
+                <option value="{{ tipe }}" {% if file_data.tipe == tipe %}selected{% endif %}>
+                  {{ tipe }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+            Ganti File (Opsional)
+          </label>
+          {% if file_data.filename %}
+            <div class="mb-2 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+              <p class="text-xs text-emerald-700 font-bold">
+                📎 File saat ini: {{ file_data.filename.split('_', 2)[2] if file_data.filename else 'Tidak ada' }}
+              </p>
+            </div>
+          {% endif %}
+          <input
+            type="file"
+            name="file"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+            class="w-full px-4 md:px-5 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 file:cursor-pointer"
+          />
+          <p class="text-[10px] text-slate-400 mt-1 italic">
+            Kosongkan jika tidak ingin mengganti file. Format: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX (Maks. 16MB)
+          </p>
+        </div>
+
+        <div class="bg-emerald-50 p-4 md:p-5 rounded-2xl flex items-start gap-3 md:gap-4 border border-emerald-100 text-[11px] md:text-xs text-emerald-800 leading-relaxed italic">
+          <span class="mt-0.5">💡</span>
+          <p>
+            Perubahan akan langsung tersimpan di <strong>Bank Data Guru SDIT Mutiara Duri</strong>.
+          </p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-3 md:gap-4 pt-2">
+          <a
+            href="{{ url_for('dashboard', tab='saya') }}"
+            class="md:flex-1 py-3 md:py-4 border border-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-50 text-center transition-colors"
+          >
+            Batal
+          </a>
+          <button
+            type="submit"
+            class="md:flex-1 py-3 md:py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-100 transition-all flex items-center justify-center gap-2"
+          >
+            💾 Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

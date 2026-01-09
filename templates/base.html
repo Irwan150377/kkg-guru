@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}KKG Guru SDIT Mutiara{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind CDN (cukup untuk localhost/dev) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="min-h-screen bg-slate-50 font-sans">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <div class="fixed top-4 right-4 space-y-2 z-50">
+          {% for category, msg in messages %}
+            {% set color = "bg-emerald-600" %}
+            {% if category == "error" %}{% set color = "bg-red-600" %}{% elif category == "info" %}{% set color = "bg-slate-700" %}{% endif %}
+            <div class="{{ color }} text-white px-4 py-2 rounded-lg shadow-lg text-sm">
+              {{ msg }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </body>
+</html>
+
+

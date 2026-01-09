@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - KKG Guru SDIT Mutiara{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+  <!-- Sidebar -->
+  <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex flex-col h-auto md:h-screen sticky top-0 z-40 shadow-md md:shadow-none">
+    <div class="p-6 border-b border-slate-100 flex items-center gap-3">
+      <div class="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
+        <span class="text-xs font-bold">SD</span>
+      </div>
+      <div class="min-w-0">
+        <h1 class="font-black text-xs text-emerald-700 leading-none">SDIT MUTIARA</h1>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">KKG KELAS 3</p>
+      </div>
+    </div>
+
+    <div class="p-4 flex-1 space-y-1">
+      <div class="px-4 py-3 text-[10px] font-black text-slate-300 uppercase tracking-widest">
+        Navigasi
+      </div>
+      <a href="{{ url_for('dashboard', tab='bank') }}" class="block w-full px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-emerald-50 flex items-center gap-3">
+        <span>🌐</span> Bank Data Guru
+      </a>
+      <a href="{{ url_for('dashboard', tab='saya') }}" class="block w-full px-4 py-3 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-emerald-50 flex items-center gap-3">
+        <span>📁</span> Perangkat Saya
+      </a>
+      
+      {% if teacher.is_admin %}
+      <div class="px-4 py-3 text-[10px] font-black text-slate-300 uppercase tracking-widest mt-4">
+        Admin
+      </div>
+      <a href="{{ url_for('admin') }}" class="block w-full px-4 py-3 rounded-xl text-xs font-bold transition-all bg-red-600 text-white shadow-lg shadow-red-100 flex items-center gap-3">
+        <span>👥</span> Kelola Guru
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="p-4 border-t border-slate-100 bg-emerald-50/40">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-red-600 border-2 border-white flex items-center justify-center text-white font-black text-sm shadow-sm">
+          {{ teacher.nama[0]|upper if teacher.nama else "A" }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-xs font-black text-slate-800 truncate uppercase">{{ teacher.nama }}</p>
+          <p class="text-[10px] text-red-600 font-black">ADMIN</p>
+        </div>
+      </div>
+      <a href="{{ url_for('logout') }}" class="w-full mt-4 flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 hover:text-red-500 py-2 transition-colors uppercase tracking-widest">
+        Keluar Sistem
+      </a>
+    </div>
+  </aside>
+
+  <!-- Konten Utama -->
+  <main class="flex-1 overflow-y-auto">
+    <header class="bg-white h-20 px-6 md:px-8 flex items-center justify-between border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+      <div class="flex flex-col">
+        <h2 class="text-lg font-black text-slate-800 uppercase tracking-tight">
+          👥 Kelola Guru
+        </h2>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider italic flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+          Panel Admin
+        </p>
+      </div>
+    </header>
+
+    <section class="p-6 md:p-8 max-w-4xl mx-auto">
+      <!-- Form Tambah Guru -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+          ➕ Tambah Guru Baru
+        </h3>
+        <form method="post" action="{{ url_for('tambah_guru') }}" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+                Nama Lengkap
+              </label>
+              <input type="text" name="nama" placeholder="Nama guru..." required
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none transition-all text-sm" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+                PIN (min 4 digit)
+              </label>
+              <input type="text" name="pin" placeholder="Contoh: 1234" required minlength="4"
+                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none transition-all text-sm" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">
+                Kelas
+              </label>
+              <select name="kelas" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none cursor-pointer text-sm font-bold text-slate-700">
+                <option value="3A">Kelas 3A</option>
+                <option value="3B">Kelas 3B</option>
+                <option value="3C">Kelas 3C</option>
+                <option value="3D">Kelas 3D</option>
+                <option value="3E">Kelas 3E</option>
+              </select>
+            </div>
+            <div class="flex items-end">
+              <label class="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" name="is_admin" value="1" class="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500" />
+                <span class="text-sm font-bold text-slate-700">Jadikan Admin</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-md active:scale-95">
+            ➕ Tambah Guru
+          </button>
+        </form>
+      </div>
+
+      <!-- Daftar Guru -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100">
+          <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+            📋 Daftar Guru Terdaftar ({{ guru_list|length }})
+          </h3>
+        </div>
+        
+        <div class="divide-y divide-slate-100">
+          {% for guru in guru_list %}
+          <div class="p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-full {{ 'bg-red-600' if guru.is_admin else 'bg-emerald-600' }} flex items-center justify-center text-white font-black text-lg">
+                {{ guru.nama[0]|upper }}
+              </div>
+              <div>
+                <p class="font-black text-slate-800 flex items-center gap-2">
+                  {{ guru.nama }}
+                  {% if guru.is_admin %}
+                  <span class="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full">ADMIN</span>
+                  {% endif %}
+                </p>
+                <p class="text-xs text-slate-400">
+                  Kelas {{ guru.kelas }} • PIN: <span class="font-mono bg-slate-100 px-2 py-0.5 rounded">{{ guru.pin }}</span>
+                </p>
+                <p class="text-[10px] text-slate-300 mt-1">Terdaftar: {{ guru.created_at }}</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-2 ml-16 md:ml-0">
+              <!-- Reset PIN -->
+              <form method="post" action="{{ url_for('reset_pin', guru_id=guru.id) }}" class="flex items-center gap-2">
+                <input type="text" name="new_pin" placeholder="PIN baru" minlength="4" required
+                  class="w-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500 outline-none" />
+                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-[10px] font-black uppercase transition-colors">
+                  Reset
+                </button>
+              </form>
+              
+              <!-- Hapus -->
+              {% if guru.id != teacher.id %}
+              <form method="post" action="{{ url_for('hapus_guru', guru_id=guru.id) }}" class="inline">
+                <button type="submit" onclick="return confirm('Yakin hapus guru {{ guru.nama }}?')"
+                  class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-[10px] font-black uppercase transition-colors">
+                  🗑️ Hapus
+                </button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+{% endblock %}

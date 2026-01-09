@@ -1,0 +1,430 @@
+import React, { useState } from 'react';
+import { 
+  BookOpen, 
+  Layout, 
+  Upload, 
+  Search, 
+  Bell, 
+  MoreVertical, 
+  Folder, 
+  Download, 
+  Trash2, 
+  User, 
+  Users,
+  Plus, 
+  Share2, 
+  Menu, 
+  X, 
+  Globe, 
+  LogOut, 
+  ChevronDown, 
+  CheckCircle2,
+  FileText,
+  Save,
+  School
+} from 'lucide-react';
+
+const KKGApp = () => {
+  // State Navigasi Utama: 'daftar' atau 'dashboard'
+  const [view, setView] = useState('daftar');
+  
+  // State Tab Aktif di Dashboard: 'bank' atau 'saya'
+  const [activeTab, setActiveTab] = useState('bank');
+
+  // State Profil Guru
+  const [teacherProfile, setTeacherProfile] = useState({
+    nama: '',
+    kelas: '3A'
+  });
+
+  // State Modal Upload
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [newFileData, setNewFileData] = useState({
+    judul: '',
+    tipe: 'Modul Ajar',
+    mapel: 'Matematika'
+  });
+
+  // State Notifikasi
+  const [notification, setNotification] = useState(null);
+
+  // Database Perangkat Ajar (Pre-filled dengan rekan-rekan guru SDIT Mutiara Duri)
+  const [bankData, setBankData] = useState([
+    { id: 1, judul: 'ATP Matematika Fase B', tipe: 'ATP', mapel: 'Matematika', pengupload: 'Pak Zelnedi', kelas: '3A', tanggal: '02 Jan 2025' },
+    { id: 2, judul: 'Modul Ajar: Bilangan Cacah', tipe: 'Modul Ajar', mapel: 'Matematika', pengupload: 'Pak Irwan Darma', kelas: '3B', tanggal: '05 Jan 2025' },
+    { id: 3, judul: 'Prota & Promes Semester 2', tipe: 'Promes', mapel: 'Umum', pengupload: 'Buk Yuki', kelas: '3A', tanggal: '20 Des 2024' },
+    { id: 4, judul: 'Modul Ajar: IPAS (Siklus Air)', tipe: 'Modul Ajar', mapel: 'IPAS', pengupload: 'Buk Irta', kelas: '3C', tanggal: '06 Jan 2025' },
+    { id: 5, judul: 'Asesmen Harian B. Indo', tipe: 'Asesmen', mapel: 'B. Indonesia', pengupload: 'Buk Eni', kelas: '3E', tanggal: '07 Jan 2025' },
+  ]);
+
+  const showNotify = (msg) => {
+    setNotification(msg);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleDaftar = (e) => {
+    e.preventDefault();
+    if (!teacherProfile.nama.trim()) {
+      showNotify('Silakan masukkan nama Anda');
+      return;
+    }
+    setView('dashboard');
+    showNotify(`Selamat datang di SDIT Mutiara Duri, ${teacherProfile.nama}!`);
+  };
+
+  const handleUploadFile = (e) => {
+    e.preventDefault();
+    if (!newFileData.judul.trim()) {
+      showNotify('Judul tidak boleh kosong');
+      return;
+    }
+
+    const newFile = {
+      id: Date.now(),
+      judul: newFileData.judul,
+      tipe: newFileData.tipe,
+      mapel: newFileData.mapel,
+      pengupload: teacherProfile.nama,
+      kelas: teacherProfile.kelas,
+      tanggal: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+    };
+
+    setBankData([newFile, ...bankData]);
+    setIsUploadOpen(false);
+    setNewFileData({ judul: '', tipe: 'Modul Ajar', mapel: 'Matematika' });
+    setActiveTab('saya');
+    showNotify('Berhasil mengupload perangkat baru!');
+  };
+
+  const handleDeleteFile = (id) => {
+    setBankData(bankData.filter(file => file.id !== id));
+    showNotify('File berhasil dihapus.');
+  };
+
+  // --- HALAMAN DAFTAR ---
+  if (view === 'daftar') {
+    return (
+      <div className="min-h-screen bg-emerald-50 flex items-center justify-center p-4 font-sans">
+        {notification && (
+          <div className="fixed top-5 right-5 bg-emerald-800 text-white px-6 py-3 rounded-xl shadow-2xl z-50 animate-bounce">
+            {notification}
+          </div>
+        )}
+        <div className="bg-white w-full max-w-md rounded-3xl shadow-xl overflow-hidden border border-emerald-100">
+          <div className="bg-emerald-600 p-8 text-center text-white">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <School className="w-8 h-8" />
+            </div>
+            <h1 className="text-xl font-bold leading-tight">KKG Guru Kelas 3<br/>SDIT Mutiara Duri</h1>
+            <p className="text-emerald-100 text-xs mt-2 italic">Mencetak Generasi Qur'ani dan Berprestasi</p>
+          </div>
+          
+          <form onSubmit={handleDaftar} className="p-8 space-y-6">
+            <div>
+              <label className="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">Nama Lengkap Guru</label>
+              <input 
+                type="text" 
+                placeholder="Nama Anda..." 
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all"
+                value={teacherProfile.nama}
+                onChange={(e) => setTeacherProfile({...teacherProfile, nama: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">Penempatan Kelas 3</label>
+              <div className="relative">
+                <select 
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 outline-none appearance-none cursor-pointer font-bold text-slate-700"
+                  value={teacherProfile.kelas}
+                  onChange={(e) => setTeacherProfile({...teacherProfile, kelas: e.target.value})}
+                >
+                  <option value="3A">Kelas 3A</option>
+                  <option value="3B">Kelas 3B</option>
+                  <option value="3C">Kelas 3C</option>
+                  <option value="3D">Kelas 3D</option>
+                  <option value="3E">Kelas 3E</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95">
+              Masuk Dashboard SDIT
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  const displayData = activeTab === 'saya' 
+    ? bankData.filter(item => item.pengupload === teacherProfile.nama)
+    : bankData;
+
+  // --- HALAMAN DASHBOARD ---
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans flex flex-col md:flex-row">
+      {notification && (
+        <div className="fixed top-5 right-5 bg-emerald-800 text-white px-6 py-3 rounded-xl shadow-2xl z-[60] animate-fade-in">
+          {notification}
+        </div>
+      )}
+
+      {/* Sidebar */}
+      <div className="w-full md:w-64 bg-white border-r border-slate-200 flex flex-col h-auto md:h-screen sticky top-0 z-40 shadow-xl md:shadow-none">
+        <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
+            <School className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="font-black text-xs text-emerald-700 leading-none">SDIT MUTIARA</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">KKG KELAS 3</p>
+          </div>
+        </div>
+        
+        <div className="p-4 flex-1 space-y-1">
+          <div className="px-4 py-3 text-[10px] font-black text-slate-300 uppercase tracking-widest">Navigasi</div>
+          <button 
+            onClick={() => setActiveTab('bank')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${activeTab === 'bank' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100' : 'text-slate-600 hover:bg-emerald-50'}`}
+          >
+            <Globe className="w-4 h-4" /> Bank Data Guru
+          </button>
+          <button 
+            onClick={() => setActiveTab('saya')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-all ${activeTab === 'saya' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100' : 'text-slate-600 hover:bg-emerald-50'}`}
+          >
+            <Folder className="w-4 h-4" /> Perangkat Saya
+          </button>
+        </div>
+
+        <div className="p-4 border-t border-slate-100 bg-emerald-50/30">
+           <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-emerald-600 border-2 border-white flex items-center justify-center text-white font-black text-sm shadow-sm">
+                {teacherProfile.nama ? teacherProfile.nama.charAt(0).toUpperCase() : 'G'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-black text-slate-800 truncate uppercase">{teacherProfile.nama}</p>
+                <p className="text-[10px] text-emerald-600 font-black">KELAS {teacherProfile.kelas}</p>
+              </div>
+           </div>
+           <button onClick={() => setView('daftar')} className="w-full mt-4 flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 hover:text-red-500 py-2 transition-colors uppercase tracking-widest">
+             <LogOut className="w-3 h-3" /> Keluar Sistem
+           </button>
+        </div>
+      </div>
+
+      {/* Konten Utama */}
+      <div className="flex-1 overflow-y-auto">
+        <header className="bg-white h-20 px-8 flex items-center justify-between border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+          <div className="flex flex-col">
+            <h2 className="text-lg font-black text-slate-800 uppercase tracking-tight">
+              {activeTab === 'bank' ? 'Bank Data Guru SDIT' : 'Koleksi Saya'}
+            </h2>
+            <div className="flex items-center gap-1.5">
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider italic">SDIT Mutiara Duri - Riau</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsUploadOpen(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg shadow-emerald-100 active:scale-95"
+          >
+            <Plus className="w-4 h-4" /> Upload Materi
+          </button>
+        </header>
+
+        <div className="p-8 max-w-6xl mx-auto">
+          {/* Welcome Card */}
+          <div className="bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 mb-10 relative overflow-hidden group">
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+              <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-[2rem] flex items-center justify-center border border-white/30">
+                <Users className="w-10 h-10 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black mb-1">Selamat Datang, {teacherProfile.nama}!</h3>
+                <p className="text-emerald-50 opacity-90 text-sm font-medium">Anda terhubung dengan seluruh guru kelas 3 SDIT Mutiara Duri. Mari berbagi kebaikan melalui perangkat ajar.</p>
+              </div>
+            </div>
+            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+          </div>
+
+          <div className="flex items-center justify-between mb-6">
+             <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+               <Folder className="w-4 h-4" /> Daftar Perangkat Terbaru
+             </h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {displayData.length > 0 ? (
+              displayData.map((file) => (
+                <div key={file.id} className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden hover:shadow-2xl hover:border-emerald-200 transition-all duration-300 group relative">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${file.tipe === 'ATP' ? 'bg-purple-50 text-purple-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                        <FileText className="w-7 h-7" />
+                      </div>
+                      <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black px-3 py-1.5 rounded-xl border border-emerald-100 shadow-sm">
+                        KELAS {file.kelas}
+                      </span>
+                    </div>
+                    
+                    <h4 className="font-black text-slate-800 mb-2 leading-snug text-base group-hover:text-emerald-600 transition-colors">{file.judul}</h4>
+                    <div className="flex items-center gap-2 mb-6">
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{file.tipe}</span>
+                       <span className="text-[10px] font-bold text-slate-300">•</span>
+                       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{file.mapel}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 pt-5 border-t border-slate-50">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-emerald-600 border border-white shadow-sm">
+                        {file.pengupload ? file.pengupload.charAt(0).toUpperCase() : 'G'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-black text-slate-700 truncate">{file.pengupload}</p>
+                        <p className="text-[10px] text-slate-400 font-bold italic tracking-tighter">SDIT Mutiara Duri • {file.tanggal}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="px-6 py-4 bg-slate-50/50 border-t border-slate-50 flex justify-between items-center group-hover:bg-emerald-50 transition-colors">
+                     {activeTab === 'saya' ? (
+                       <button 
+                        onClick={() => handleDeleteFile(file.id)}
+                        className="text-[10px] font-black text-red-500 uppercase flex items-center gap-1.5 hover:text-red-700 transition-colors"
+                       >
+                         <Trash2 className="w-3.5 h-3.5" /> Hapus Perangkat
+                       </button>
+                     ) : (
+                       <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Siap Unduh</span>
+                       </div>
+                     )}
+                     <button 
+                      onClick={() => showNotify(`Mengunduh file: ${file.judul}...`)}
+                      className="w-10 h-10 bg-white border border-slate-200 rounded-xl text-slate-600 hover:text-white hover:bg-emerald-600 hover:border-emerald-600 transition-all shadow-sm active:scale-90 flex items-center justify-center"
+                      title="Download"
+                     >
+                       <Download className="w-5 h-5" />
+                     </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-24 text-center bg-white rounded-[3rem] border border-dashed border-slate-200 shadow-inner">
+                <Folder className="w-16 h-16 text-slate-200 mx-auto mb-6 opacity-50" />
+                <p className="text-slate-400 font-black text-xs uppercase tracking-widest">Belum ada perangkat yang dibagikan.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Modal Upload Materi */}
+      {isUploadOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 animate-scale-up">
+            <div className="bg-emerald-50 px-8 py-7 border-b border-emerald-100 flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-black text-emerald-800 uppercase tracking-tight">Upload Perangkat</h3>
+                <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-1">Berbagi dengan rekan SDIT Mutiara</p>
+              </div>
+              <button 
+                onClick={() => setIsUploadOpen(false)}
+                className="w-10 h-10 bg-white border border-emerald-100 flex items-center justify-center rounded-full hover:bg-red-50 hover:text-red-500 transition-colors shadow-sm"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleUploadFile} className="p-8 space-y-6">
+              <div>
+                <label className="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">Judul File Perangkat</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="Contoh: Modul Ajar Matematika - Pecahan" 
+                  className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-medium"
+                  value={newFileData.judul}
+                  onChange={(e) => setNewFileData({...newFileData, judul: e.target.value})}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">Mata Pelajaran</label>
+                  <select 
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none cursor-pointer text-sm font-bold text-slate-700 appearance-none"
+                    value={newFileData.mapel}
+                    onChange={(e) => setNewFileData({...newFileData, mapel: e.target.value})}
+                  >
+                    <option value="Matematika">Matematika</option>
+                    <option value="B. Indonesia">B. Indonesia</option>
+                    <option value="IPAS">IPAS</option>
+                    <option value="Seni">Seni</option>
+                    <option value="Umum">Umum</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-emerald-700 uppercase mb-2 tracking-widest">Tipe Dokumen</label>
+                  <select 
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none cursor-pointer text-sm font-bold text-slate-700 appearance-none"
+                    value={newFileData.tipe}
+                    onChange={(e) => setNewFileData({...newFileData, tipe: e.target.value})}
+                  >
+                    <option value="Modul Ajar">Modul Ajar</option>
+                    <option value="ATP">ATP</option>
+                    <option value="Promes">Promes</option>
+                    <option value="Prota">Prota</option>
+                    <option value="Asesmen">Asesmen</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 p-5 rounded-2xl flex items-start gap-4 border border-emerald-100">
+                <div className="mt-1"><Share2 className="w-5 h-5 text-emerald-600" /></div>
+                <p className="text-[11px] text-emerald-800 leading-relaxed font-medium italic">
+                  Perangkat ajar ini akan otomatis tersedia di <strong>Bank Data Guru SDIT Mutiara Duri</strong> dan bisa diunduh oleh rekan sejawat lainnya.
+                </p>
+              </div>
+
+              <div className="flex gap-4 pt-4">
+                <button 
+                  type="button"
+                  onClick={() => setIsUploadOpen(false)}
+                  className="flex-1 py-4 border border-slate-200 rounded-2xl font-black text-xs uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-colors"
+                >
+                  Batal
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-100 transition-all flex items-center justify-center gap-2"
+                >
+                  <Save className="w-4 h-4" /> Simpan & Bagikan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Styles for animation */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes fade-in {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scale-up {
+          from { transform: scale(0.9) translateY(20px); opacity: 0; }
+          to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+        .animate-scale-up { animation: scale-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      `}} />
+    </div>
+  );
+};
+
+export default KKGApp;
