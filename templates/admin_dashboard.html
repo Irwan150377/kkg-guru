@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - KKG Guru SDIT Mutiara{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50">
+  <!-- Header -->
+  <header class="bg-red-600 text-white p-6 shadow-lg">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-black">👑 Admin Dashboard</h1>
+        <p class="text-red-100 text-sm">SDIT Mutiara Duri - Panel Kontrol</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm">Selamat datang, <strong>{{ admin.nama }}</strong></span>
+        <a href="{{ url_for('admin_logout') }}" class="bg-red-700 hover:bg-red-800 px-4 py-2 rounded-lg text-sm font-bold transition-colors">
+          Logout
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-6xl mx-auto p-6 space-y-8">
+    <!-- Statistik Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-2xl">👥</div>
+          <div>
+            <p class="text-xs text-slate-400 font-black uppercase">Total Ustadz/Ustadzah</p>
+            <p class="text-2xl font-black text-blue-600">{{ total_guru }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-2xl">📚</div>
+          <div>
+            <p class="text-xs text-slate-400 font-black uppercase">Total Perangkat</p>
+            <p class="text-2xl font-black text-green-600">{{ total_perangkat }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-2xl">🔥</div>
+          <div>
+            <p class="text-xs text-slate-400 font-black uppercase">Aktif Hari Ini</p>
+            <p class="text-2xl font-black text-purple-600">{{ guru_aktif_hari_ini }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center text-2xl">👑</div>
+          <div>
+            <p class="text-xs text-slate-400 font-black uppercase">Total Admin</p>
+            <p class="text-2xl font-black text-red-600">{{ total_admin }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Daftar Guru dengan PIN -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+          👥 Daftar Ustadz & Ustadzah + PIN ({{ guru_list|length }})
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">Admin bisa melihat PIN untuk membantu ustadz/ustadzah yang lupa</p>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Ustadz/Ustadzah</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Kelas</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">PIN</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Last Login</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for guru in guru_list %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full {{ 'bg-red-600' if guru.is_admin else 'bg-emerald-600' }} flex items-center justify-center text-white font-black">
+                    {% if guru.jenis_kelamin == 'P' %}
+                      🧕
+                    {% else %}
+                      👨‍🏫
+                    {% endif %}
+                  </div>
+                  <div>
+                    <p class="font-bold text-slate-800">{{ guru.nama }}</p>
+                    {% if guru.is_admin %}
+                    <span class="bg-red-100 text-red-600 text-xs font-black px-2 py-0.5 rounded-full">ADMIN</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-slate-600">{{ guru.kelas }}</td>
+              <td class="px-6 py-4">
+                <code class="bg-slate-100 text-slate-800 px-3 py-1 rounded-lg font-mono text-sm font-bold">{{ guru.pin }}</code>
+              </td>
+              <td class="px-6 py-4">
+                {% if guru.last_login and guru.last_login != 'Belum pernah login' %}
+                  <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Aktif</span>
+                {% else %}
+                  <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">Belum Login</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-xs text-slate-500">
+                {{ guru.last_login_display if guru.last_login_display != 'Belum pernah login' else 'Belum pernah login' }}
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex gap-2">
+                  <form method="post" action="{{ url_for('reset_pin', guru_id=guru.id) }}" class="flex items-center gap-2">
+                    <input type="text" name="new_pin" placeholder="PIN baru" minlength="4" required
+                      class="w-20 px-2 py-1 bg-slate-50 border border-slate-200 rounded text-xs" />
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      Reset
+                    </button>
+                  </form>
+                  {% if guru.id != admin.id %}
+                  <form method="post" action="{{ url_for('hapus_guru', guru_id=guru.id) }}" class="inline">
+                    <button type="submit" onclick="return confirm('Yakin hapus guru {{ guru.nama }}?')"
+                      class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      Hapus
+                    </button>
+                  </form>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Login History -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+          📊 Aktivitas Login Terbaru
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">20 aktivitas login terakhir</p>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Waktu</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Nama</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">IP Address</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for log in login_history %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-4 text-sm text-slate-600">{{ log.login_time }}</td>
+              <td class="px-6 py-4 font-medium text-slate-800">{{ log.nama }}</td>
+              <td class="px-6 py-4">
+                {% if log.status == 'success' %}
+                  <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">✅ Berhasil</span>
+                {% elif log.status == 'failed_wrong_pin' %}
+                  <span class="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full">❌ PIN Salah</span>
+                {% else %}
+                  <span class="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full">⚠️ User Tidak Ditemukan</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-xs text-slate-500 font-mono">{{ log.ip_address }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Daftar Perangkat Terbaru (Admin bisa hapus) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 bg-slate-50">
+        <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+          📚 Perangkat Ajar Terbaru
+        </h3>
+        <p class="text-xs text-slate-500 mt-1">Admin bisa hapus perangkat yang salah upload</p>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-slate-50 border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Judul</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Pengupload</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Mapel</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Tipe</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">File</th>
+              <th class="px-6 py-3 text-left text-xs font-black text-slate-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for perangkat in perangkat_terbaru %}
+            <tr class="hover:bg-slate-50">
+              <td class="px-6 py-4">
+                <p class="font-bold text-slate-800 text-sm">{{ perangkat.judul }}</p>
+                <p class="text-xs text-slate-500">{{ perangkat.tanggal }}</p>
+              </td>
+              <td class="px-6 py-4 text-sm text-slate-600">{{ perangkat.pengupload }}</td>
+              <td class="px-6 py-4">
+                <span class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full">{{ perangkat.mapel }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-1 rounded-full">{{ perangkat.tipe }}</span>
+              </td>
+              <td class="px-6 py-4">
+                {% if perangkat.filename %}
+                  <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">📎 Ada File</span>
+                {% else %}
+                  <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">📝 Tanpa File</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4">
+                <form method="post" action="{{ url_for('admin_delete_perangkat', file_id=perangkat.id) }}" class="inline">
+                  <button type="submit" onclick="return confirm('Yakin hapus perangkat {{ perangkat.judul }}?')"
+                    class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-bold transition-colors">
+                    🗑️ Hapus
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+      <h3 class="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+        ⚡ Quick Actions
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="{{ url_for('index') }}" class="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl p-4 text-center transition-colors">
+          <div class="text-2xl mb-2">👩‍🏫</div>
+          <p class="font-bold text-emerald-700">Lihat Dashboard Guru</p>
+        </a>
+        <button onclick="window.location.reload()" class="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl p-4 text-center transition-colors">
+          <div class="text-2xl mb-2">🔄</div>
+          <p class="font-bold text-blue-700">Refresh Data</p>
+        </button>
+        <a href="{{ url_for('admin_logout') }}" class="bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl p-4 text-center transition-colors">
+          <div class="text-2xl mb-2">🚪</div>
+          <p class="font-bold text-red-700">Logout Admin</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

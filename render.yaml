@@ -10,3 +10,8 @@ services:
       - key: SECRET_KEY
         generateValue: true
 
+databases:
+  - name: kkg-guru-db
+    databaseName: kkg_guru
+    user: kkg_user
+

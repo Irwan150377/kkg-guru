@@ -13,7 +13,7 @@ ENV/
 instance/
 .webassets-cache
 
-# Uploads
+# Uploads (untuk development, production pakai cloud storage)
 uploads/
 *.pdf
 *.doc
@@ -36,12 +36,17 @@ Thumbs.db
 # Environment
 .env
 .env.local
+.env.production
 
 # Logs
 *.log
 
-# Database
+# Database (SQLite untuk development)
 *.db
 *.sqlite
 *.sqlite3
+
+# Deployment
+.vercel
+.netlify
 
