@@ -249,9 +249,14 @@ def logout():
 # Inisialisasi database saat aplikasi dimulai
 db.init_tables()
 
-# Vercel handler
-def handler(request):
-    return app(request.environ, lambda *args: None)
+# Vercel handler - PENTING untuk Vercel!
+app = Flask(__name__, 
+           template_folder='../templates',
+           static_folder='../static')
+
+# Vercel serverless function handler
+def handler(environ, start_response):
+    return app(environ, start_response)
 
 if __name__ == "__main__":
     app.run(debug=True)
