@@ -268,11 +268,17 @@ def upload():
                 return redirect(url_for("dashboard", tab="saya"))
             
             # Insert ke database dulu untuk dapat ID
-            new_id = db.execute_query(
-                "INSERT INTO perangkat (judul, tipe, mapel, pengupload, kelas, tanggal, filename) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id" if db.is_postgres
-                else "INSERT INTO perangkat (judul, tipe, mapel, pengupload, kelas, tanggal, filename) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (judul, tipe, mapel, teacher["nama"], teacher["kelas"], tanggal, None)
-            )
+            if db.is_postgres:
+                new_id = db.execute_query(
+                    "INSERT INTO perangkat (judul, tipe, mapel, pengupload, kelas, tanggal, filename) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id",
+                    (judul, tipe, mapel, teacher["nama"], teacher["kelas"], tanggal, None),
+                    fetch="one"
+                )["id"]
+            else:
+                new_id = db.execute_query(
+                    "INSERT INTO perangkat (judul, tipe, mapel, pengupload, kelas, tanggal, filename) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (judul, tipe, mapel, teacher["nama"], teacher["kelas"], tanggal, None)
+                )
             
             # Generate nama file yang aman
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
